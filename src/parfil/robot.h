@@ -33,7 +33,7 @@ class Robot {
     void Set(double x, double y, double heading);
 
     // Set the robot's noise parameters.
-    void SetNoise(double steering_noise, double distance_noise, double double bearing_noise);
+    void SetNoise(double steering_noise, double distance_noise, double bearing_noise);
 
     // Apply motion to the robot, adding noise.
     void Move(const Motion& motion);
