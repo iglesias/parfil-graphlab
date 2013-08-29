@@ -1,10 +1,14 @@
 #include <cmath>
+#include <cstdlib>
 #include <memory>
 #include <vector>
 #include <parfil/robot.h>
 #include <parfil/filter.h>
+#include <ctime>
 
 void TestCase1(std::vector<parfil::Motion>& motions, std::vector<parfil::Measurement>& measurements) {
+  bool debug = false;
+
   // fill in motions
   int num_motions = 8;
   motions.resize(num_motions);
@@ -14,7 +18,7 @@ void TestCase1(std::vector<parfil::Motion>& motions, std::vector<parfil::Measure
   }
 
   // fill in measurements
-  double[] measurements_arr = {
+  double measurements_arr[] = {
       4.746936, 3.859782, 3.045217, 2.045506,
       3.510067, 2.916300, 2.146394, 1.598332,
       2.972469, 2.407489, 1.588474, 1.611094,
@@ -33,9 +37,19 @@ void TestCase1(std::vector<parfil::Motion>& motions, std::vector<parfil::Measure
     double* to = from + measurement_dimension;
     measurements[i].assign(from,to);
   }
+
+  if (debug) {
+    for (int i=0; i<num_measurements; ++i) {
+      for (int j=0; j<measurement_dimension; ++j) {
+        std::cout << measurements[i][j] << ' ';
+      }
+      std::cout << std::endl;
+    }
+  }
 }
 
 int main(int, char**) {
+  std::srand(std::time(0));
   int num_particles = 500;
   std::unique_ptr<parfil::Filter> filter(new parfil::Filter(num_particles));
 
@@ -43,7 +57,7 @@ int main(int, char**) {
   std::vector<parfil::Measurement> measurements;
   TestCase1(motions,measurements);
 
-  filter->run(motions,measurements);
+  filter->Run(motions,measurements);
 
   double x,y,heading;
   filter->GetPose(x,y,heading);
