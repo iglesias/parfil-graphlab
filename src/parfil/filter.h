@@ -30,9 +30,24 @@ class Filter {
     void Run(const std::vector<Motion>& motions, const std::vector<Measurement>& measurements);
 
   private:
+    // Motion update for each of the particles.
+    void Predict(const Motion& motion);
+
+    // Measurement update for each of the particles.
+    void MeasurementUpdate(const Measurement& measurement);
+
+    // Weights resampling.
+    void Resample();
+
+  private:
     // The particle set.
     std::vector<Robot> m_particles;
+
+    // The particle weights.
+    std::vector<double> m_weights;
 
 }; // class Filter
 
 } // namespace parfil
+
+#endif // PARFIL_FILTER_H__

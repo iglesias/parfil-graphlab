@@ -8,6 +8,7 @@
 #define PARFIL_ROBOT_H__
 
 #include <vector>
+#include <boost/random/normal_distribution.hpp>
 
 namespace parfil {
 
@@ -29,6 +30,15 @@ class Robot {
     // Destroy the robot.
     ~Robot();
 
+    // Get x.
+    double x() const { return m_x; }
+
+    // Get y.
+    double y() const { return m_y; }
+
+    // Get heading.
+    double heading() const { return m_h; }
+
     // Set the robot's position and heading.
     void Set(double x, double y, double heading);
 
@@ -39,10 +49,10 @@ class Robot {
     void Move(const Motion& motion);
 
     // Measure bearing to the landmarks using the robot's pose.
-    void Sense(Measurement& measurement, bool use_noise=true) const;
+    void Sense(Measurement& measurement, bool use_noise=true);
 
     // Compute the probability of a measurement given the robot's pose.
-    double ComputeMeasurementProbability(const Measurement& measurement) const;
+    double ComputeMeasurementProbability(const Measurement& measurement);
 
     // Print the robot's pose.
     void Print() const;
@@ -58,14 +68,16 @@ class Robot {
     double m_h;
 
     // Steering noise used during movement.
-    double m_steering_noise;
+    boost::random::normal_distribution<> m_steering_noise;
 
     // Distance noise used during movement.
-    double m_distance_noise;
+    boost::random::normal_distribution<> m_distance_noise;
 
     // Bearing noise used during sensing.
-    double m_bearing_noise;
+    boost::random::normal_distribution<> m_bearing_noise;
 
 }; // class Robot
 
 } // namespace parfil
+
+#endif // PARFIL_ROBOT_H__
