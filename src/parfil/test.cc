@@ -5,6 +5,7 @@
  */
 
 #include <parfil/test.h>
+#include <cstdlib>
 
 namespace parfil {
 
@@ -50,6 +51,22 @@ void Case1(std::vector<parfil::Motion>& motions, std::vector<parfil::Measurement
       std::cout << std::endl;
     }
   }
+}
+
+void Case2(std::vector<parfil::Motion>& motions, std::vector<parfil::Measurement>& measurements,
+           parfil::Robot& robot, int num_iterations)
+{
+  // Fill in movements.
+  motions.clear();
+  motions.reserve(num_iterations);
+  for (int i=0; i<num_iterations; ++i)
+    motions.push_back(Motion(2*M_PI/20, 12));
+
+  // Steering, distance and bearing noise, respectively.
+  robot.SetNoise(0.1,5.0,0.1);
+
+  // Apply movements to the robot, generating measurements accordingly.
+  robot.GenerateGroundTruth(measurements,motions);
 }
 
 } // namespace test

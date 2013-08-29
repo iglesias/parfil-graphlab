@@ -16,6 +16,8 @@ namespace test {
 
 void Case1(std::vector<parfil::Motion>& motions, std::vector<parfil::Measurement>& measurements);
 
+void Case2(std::vector<parfil::Motion>& motions, std::vector<parfil::Measurement>& measurements, parfil::Robot& robot, int num_iterations=100);
+
 } // namespace test
 
 } // namespace parfil
