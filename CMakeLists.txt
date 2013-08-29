@@ -11,7 +11,7 @@ set(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/bin CACHE PATH "Install path prefix
 # message(${CMAKE_INCLUDE_PATH})
 # include_directories(SYSTEM "${Boost_INCLUDE_DIRS}")
 
-set (SOURCES src/parfil/filter.cc src/parfil/robot.cc src/parfil/main.cc)
+set(SOURCES src/parfil/filter.cc src/parfil/robot.cc src/parfil/test.cc src/parfil/main.cc)
 
 include_directories(${CMAKE_SOURCE_DIR}/src)
 include_directories("/home/iglesias/workspace/boost_1_54_0")
