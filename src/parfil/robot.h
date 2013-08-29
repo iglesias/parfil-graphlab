@@ -16,8 +16,13 @@ typedef std::vector<double> Measurement;
 
 // Class which contains the information to move the robot.
 struct Motion {
-  double steering_angle;
-  double forward_distance;
+  public:
+    Motion();
+    Motion(double angle, double distance);
+
+  public:
+    double steering_angle;
+    double forward_distance;
 }; // struct Motion
 
 // Class which contains the state of the robot and can be used to represent the
@@ -56,6 +61,9 @@ class Robot {
 
     // Print the robot's pose.
     void Print() const;
+
+    // Simulate robot movement, filling in measurements as it moves.
+    void GenerateGroundTruth(std::vector<Measurement>& measurements, const std::vector<Motion>& motions);
 
   private:
     // Position in x measured in metres.

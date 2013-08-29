@@ -22,6 +22,19 @@ const int NUM_LANDMARKS = 4;
 // Position of four landmarks in (y,x) format.
 const double LANDMARKS[NUM_LANDMARKS][2] = {{0, 100}, {0,0}, {100,0}, {100,100}};
 
+// Default motion constructor.
+Motion::Motion() {
+  steering_angle   = 0.0;
+  forward_distance = 0.0;
+}
+
+// Motion constructor.
+Motion::Motion(double angle, double distance)
+{
+  steering_angle   = angle;
+  forward_distance = distance;
+}
+
 // Default constructor.
 Robot::Robot() {
   // Set pose.
@@ -137,6 +150,18 @@ double Robot::ComputeMeasurementProbability(const Measurement& measurement) {
 // Print robot's pose.
 void Robot::Print() const {
   std::cout << "x: " << m_x << " y: " << m_y << " heading: " << m_h << std::endl;
+}
+
+// Simulate robot movement and fill in measurements.
+void Robot::GenerateGroundTruth(std::vector<Measurement>& measurements, const std::vector<Motion>& motions)
+{
+  measurements.clear();
+  measurements.resize(motions.size());
+
+  for (unsigned int i=0; i<motions.size(); ++i) {
+    Move(motions[i]);
+    Sense(measurements[i]);
+  }
 }
 
 } // namespace parfil
