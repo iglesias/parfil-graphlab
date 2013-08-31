@@ -6,6 +6,7 @@
 
 #include <parfil/test.h>
 #include <cstdlib>
+#include <iostream>
 
 namespace parfil {
 

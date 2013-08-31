@@ -6,6 +6,7 @@
 #include <parfil/filter.h>
 #include <ctime>
 #include <parfil/test.h>
+#include <iostream>
 
 int main(int, char**) {
   std::srand(std::time(0));

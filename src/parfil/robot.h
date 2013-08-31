@@ -8,7 +8,7 @@
 #define PARFIL_ROBOT_H__
 
 #include <vector>
-#include <boost/random/normal_distribution.hpp>
+#include <random>
 
 namespace parfil {
 
@@ -76,13 +76,13 @@ class Robot {
     double m_h;
 
     // Steering noise used during movement.
-    boost::random::normal_distribution<> m_steering_noise;
+	std::normal_distribution<> m_steering_noise;
 
     // Distance noise used during movement.
-    boost::random::normal_distribution<> m_distance_noise;
+    std::normal_distribution<> m_distance_noise;
 
     // Bearing noise used during sensing.
-    boost::random::normal_distribution<> m_bearing_noise;
+    std::normal_distribution<> m_bearing_noise;
 
 }; // class Robot
 

@@ -6,8 +6,8 @@
 
 #include <parfil/filter.h>
 #include <algorithm>
-#include <boost/random/uniform_real_distribution.hpp>
 #include <cstdlib>
+#include <cassert>
 
 namespace parfil {
 
