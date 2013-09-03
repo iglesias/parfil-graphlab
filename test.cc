@@ -55,7 +55,7 @@ void Case1(std::vector<parfil::Motion>& motions, std::vector<parfil::Measurement
 }
 
 void Case2(std::vector<parfil::Motion>& motions, std::vector<parfil::Measurement>& measurements,
-           parfil::Robot& robot, int num_iterations)
+           parfil::Particle& robot_pose, int num_iterations)
 {
   // Fill in movements.
   motions.clear();
@@ -64,7 +64,7 @@ void Case2(std::vector<parfil::Motion>& motions, std::vector<parfil::Measurement
     motions.push_back(Motion(2*M_PI/20, 12));
 
   // Apply movements to the robot, generating measurements accordingly.
-  robot.GenerateGroundTruth(measurements,motions);
+  robot_pose.GenerateGroundTruth(measurements,motions);
 }
 
 } // namespace test

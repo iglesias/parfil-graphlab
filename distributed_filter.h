@@ -8,31 +8,9 @@
 #define PARFIL_DISTRIBUTED_FILTER_H__
 
 #include <graphlab.hpp>
-#include "robot.h"
+#include "particle.h"
 
 namespace parfil {
-
-struct Particle {
-  public:
-    // Default constructor.
-    Particle();
-
-    // Assign operator.
-    Particle& operator=(const Particle& rhs);
-
-    // Write data to output stream.
-    void save(graphlab::oarchive& oarc) const;
-
-    // Read data from input stream.
-    void load(graphlab::iarchive& iarc);
-
-  public:
-    // The particle x, y and orientation.
-    Robot pose;
-    // The particle weight.
-    double weight;
-
-}; // struct Particle
 
 typedef graphlab::distributed_graph<Particle, graphlab::empty> DistributedGraph;
 

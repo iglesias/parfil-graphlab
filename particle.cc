@@ -4,11 +4,10 @@
  * Copyright (c) 2013 Fernando J. Iglesias Garcia
  */
 
-#include "robot.h"
+#include "particle.h"
 #include <cassert>
 #include <cmath>
 #include <cstdlib>
-#include <iostream>
 
 namespace parfil {
 
@@ -37,37 +36,36 @@ Motion::Motion(double angle, double distance)
 }
 
 // Default constructor.
-Robot::Robot() {
+Particle::Particle() {
   // Set pose.
   m_x = WORLD_SIZE*std::rand()/RAND_MAX;
   m_y = WORLD_SIZE*std::rand()/RAND_MAX;
   m_h = 2.0*M_PI*std::rand()/RAND_MAX;
+  m_w = 0.0;
 }
 
 // Destructor.
-Robot::~Robot() {
+Particle::~Particle() {
 }
 
-Robot& Robot::operator=(const Robot& rhs) {
-  m_x = rhs.x();
-  m_y = rhs.y();
-  m_h = rhs.heading();
-
+Particle& Particle::operator=(const Particle& rhs) {
+  SetPose(rhs.x(),rhs.y(),rhs.heading());
+  SetWeight(rhs.weight());
   return *this;
 }
 
-void Robot::save(graphlab::oarchive& oarc) const {
-  oarc << m_x << m_y << m_h;
+void Particle::save(graphlab::oarchive& oarc) const {
+  oarc << m_x << m_y << m_h << m_w;
 }
 
-void Robot::load(graphlab::iarchive& iarc) {
-  iarc >> m_x >> m_y >> m_h;
+void Particle::load(graphlab::iarchive& iarc) {
+  iarc >> m_x >> m_y >> m_h >> m_w;
 }
 
-// Set robot's position and heading.
-void Robot::Set(double x, double y, double heading) {
+// Set particle's position and heading.
+void Particle::SetPose(double x, double y, double heading) {
   if (heading < 0 || heading >= 2.0*M_PI) {
-    std::cerr << "Robot::Set: The heading must be in [0,2*Pi), given "
+    std::cerr << "Particle::SetPose: The heading must be in [0,2*Pi), given "
               << heading <<  '.' << std::endl;
     std::exit(1);
   }
@@ -77,10 +75,21 @@ void Robot::Set(double x, double y, double heading) {
   m_h = heading;
 }
 
-// Move robot.
-void Robot::Move(const Motion& motion) {
+// Set particle's weight.
+void Particle::SetWeight(double weight) {
+  if (weight < 0) {
+    std::cerr << "Particle::SetWeight: The weight must be larger than zero, given "
+              << weight <<  '.' << std::endl;
+    std::exit(1);
+  }
+
+  m_w = weight;
+}
+
+// Move particle.
+void Particle::Move(const Motion& motion) {
   if (motion.forward_distance < 0) {
-    std::cerr << "Robot::Move: The robot cannot move backwards, forward distance is "
+    std::cerr << "Particle::Move: The particle cannot move backwards, forward distance is "
               << motion.forward_distance << '.' << std::endl;
     std::exit(1);
   }
@@ -96,11 +105,11 @@ void Robot::Move(const Motion& motion) {
 }
 
 // Measure bearing to landmarks.
-void Robot::Sense(Measurement& measurement, bool use_noise) {
+void Particle::Sense(Measurement& measurement, bool use_noise) {
   measurement.resize(NUM_LANDMARKS);
 
   for (int i=0; i<NUM_LANDMARKS; ++i) {
-    // Measure angle or bearing between the robot pose and each landmark.
+    // Measure angle or bearing between the particle pose and each landmark.
     double bearing = atan2(LANDMARKS[i][0]-m_y, LANDMARKS[i][1]-m_x)-m_h;
 
     if (use_noise)
@@ -113,8 +122,9 @@ void Robot::Sense(Measurement& measurement, bool use_noise) {
   }
 }
 
-// Computes the probability of a mesurement of the bearings.
-double Robot::ComputeMeasurementProbability(const Measurement& measurement) {
+// Computes the probability of a mesurement of the bearings and update the
+// particle's weight.
+void Particle::UpdateWeight(const Measurement& measurement) {
   // Compute the noiseless measurement.
   Measurement true_measurement;
   Sense(true_measurement,false);
@@ -132,16 +142,11 @@ double Robot::ComputeMeasurementProbability(const Measurement& measurement) {
     total_error *= exp(-pow(error,2) / pow(BEARING_NOISE,2) / 2) / sqrt(2.0*M_PI*pow(BEARING_NOISE,2));
   }
 
-  return total_error;
+  SetWeight(total_error);
 }
 
-// Print robot's pose.
-void Robot::Print() const {
-  std::cout << "x: " << m_x << " y: " << m_y << " heading: " << m_h << std::endl;
-}
-
-// Simulate robot movement and fill in measurements.
-void Robot::GenerateGroundTruth(std::vector<Measurement>& measurements, const std::vector<Motion>& motions)
+// Simulate particle movement and fill in measurements.
+void Particle::GenerateGroundTruth(std::vector<Measurement>& measurements, const std::vector<Motion>& motions)
 {
   measurements.clear();
   measurements.resize(motions.size());
@@ -150,6 +155,10 @@ void Robot::GenerateGroundTruth(std::vector<Measurement>& measurements, const st
     Move(motions[i]);
     Sense(measurements[i]);
   }
+}
+
+bool Particle::WeightComparator(const Particle& lhs, const Particle& rhs) {
+  return lhs.weight() < rhs.weight();
 }
 
 } // namespace parfil

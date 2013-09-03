@@ -8,7 +8,7 @@
 #define PARFIL_FILTER_H__
 
 #include <vector>
-#include "robot.h"
+#include "particle.h"
 
 namespace parfil {
 
@@ -41,10 +41,7 @@ class Filter {
 
   private:
     // The particle set.
-    std::vector<Robot> m_particles;
-
-    // The particle weights.
-    std::vector<double> m_weights;
+    std::vector<Particle> m_particles;
 
 }; // class Filter
 

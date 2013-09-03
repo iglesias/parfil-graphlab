@@ -15,26 +15,6 @@ const Motion* MOTION = NULL;
 // Pointer to the measurement currently processed.
 const Measurement* MEASUREMENT = NULL;
 
-Particle::Particle() {
-  pose = Robot();
-  weight = 0.0;
-}
-
-Particle& Particle::operator=(const Particle& rhs) {
-  pose = rhs.pose;
-  weight = rhs.weight;
-
-  return *this;
-}
-
-void Particle::save(graphlab::oarchive& oarc) const {
-  oarc << pose << weight;
-}
-
-void Particle::load(graphlab::iarchive& iarc) {
-  iarc >> pose >> weight;
-}
-
 // Constructor from the number of particles.
 DistributedFilter::DistributedFilter(graphlab::distributed_control dc, int num_particles) {
   assert(num_particles>0);
@@ -89,11 +69,11 @@ void DistributedFilter::MeasurementUpdate(const Measurement& measurement) {
 }
 
 void ParticlePredict(DistributedGraph::vertex_type& v) {
-  v.data().pose.Move(*MOTION);
+  v.data().Move(*MOTION);
 }
 
 void ParticleMeasurementUpdate(DistributedGraph::vertex_type& v) {
-  v.data().weight = v.data().pose.ComputeMeasurementProbability(*MEASUREMENT);
+  v.data().UpdateWeight(*MEASUREMENT);
 }
 
 } // namespace parfil

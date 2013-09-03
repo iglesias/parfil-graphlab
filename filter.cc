@@ -17,15 +17,12 @@ extern double WORLD_SIZE;
 Filter::Filter(int num_particles) {
   assert(num_particles>0);
 
-  // Particle pose allocation and initialization.
+  // Particles allocation and initialization.
 
   m_particles.reserve(num_particles);
 
   for (int i=0; i<num_particles; ++i)
-    m_particles.push_back(Robot());
-
-  // Particle weights allocation.
-  m_weights.resize(num_particles);
+    m_particles.push_back(Particle());
 }
 
 // Destructor.
@@ -70,22 +67,22 @@ void Filter::Predict(const Motion& motion) {
 
 void Filter::MeasurementUpdate(const Measurement& measurement) {
   for (unsigned int i=0; i<m_particles.size(); ++i)
-    m_weights[i] = m_particles[i].ComputeMeasurementProbability(measurement);
+    m_particles[i].UpdateWeight(measurement);
 }
 
 // Circular resampling.
 void Filter::Resample() {
   int index = int(1.0*std::rand()/RAND_MAX*m_particles.size());
   double beta = 0.0;
-  double max_weight = *std::max_element(m_weights.begin(),m_weights.end());
-  std::vector<Robot> new_particles;
+  double max_weight = std::max_element(m_particles.begin(),m_particles.end(),Particle::WeightComparator)->weight();
+  std::vector<Particle> new_particles;
   new_particles.reserve(m_particles.size());
 
-  for (unsigned int i=0; i<m_weights.size(); ++i) {
+  for (unsigned int i=0; i<m_particles.size(); ++i) {
     beta += 1.0*std::rand()/RAND_MAX*2*max_weight;
 
-    while (beta > m_weights[index]) {
-      beta -= m_weights[index];
+    while (beta > m_particles[index].weight()) {
+      beta -= m_particles[index].weight();
       index = (index+1)%m_particles.size();
     }
 
