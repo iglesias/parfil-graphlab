@@ -64,9 +64,9 @@ void Filter::Run(const std::vector<Motion>& motions, const std::vector<Measureme
   assert(motions.size()==measurements.size());
 
   for (unsigned int t = 0; t<motions.size(); ++t) {
-    Filter::Predict(motions[t]);
-    Filter::MeasurementUpdate(measurements[t]);
-    Filter::Resample();
+    Predict(motions[t]);
+    MeasurementUpdate(measurements[t]);
+    Resample();
   }
 }
 
