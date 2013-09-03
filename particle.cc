@@ -38,9 +38,9 @@ Motion::Motion(double angle, double distance)
 // Default constructor.
 Particle::Particle() {
   // Set pose.
-  m_x = WORLD_SIZE*std::rand()/RAND_MAX;
-  m_y = WORLD_SIZE*std::rand()/RAND_MAX;
-  m_h = 2.0*M_PI*std::rand()/RAND_MAX;
+  m_x = graphlab::random::uniform(0.0,WORLD_SIZE);
+  m_y = graphlab::random::uniform(0.0,WORLD_SIZE);
+  m_y = graphlab::random::uniform(0.0,2.0*M_PI);
   m_w = 0.0;
 }
 

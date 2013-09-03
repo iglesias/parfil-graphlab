@@ -1,7 +1,5 @@
 #include <vector>
 #include <iostream>
-#include <cstdlib>
-#include <ctime>
 
 #include "particle.h"
 #include "test.h"
@@ -10,7 +8,7 @@
 #include <graphlab.hpp>
 
 int main(int argc, char** argv) {
-  std::srand(std::time(0));
+  graphlab::random::seed();
 
   std::vector<parfil::Motion> motions;
   std::vector<parfil::Measurement> measurements;
