@@ -13,10 +13,6 @@ namespace parfil {
 
 extern double WORLD_SIZE;
 
-const double STEERING_NOISE = 0.1;
-const double DISTANCE_NOISE = 5.0;
-const double BEARING_NOISE  = 0.1;
-
 // Constructor from the number of particles.
 Filter::Filter(int num_particles) {
   assert(num_particles>0);
@@ -25,11 +21,8 @@ Filter::Filter(int num_particles) {
 
   m_particles.reserve(num_particles);
 
-  for (int i=0; i<num_particles; ++i) {
-    Robot particle = Robot();
-    particle.SetNoise(STEERING_NOISE,DISTANCE_NOISE,BEARING_NOISE);
-    m_particles.push_back(particle);
-  }
+  for (int i=0; i<num_particles; ++i)
+    m_particles.push_back(Robot());
 
   // Particle weights allocation.
   m_weights.resize(num_particles);

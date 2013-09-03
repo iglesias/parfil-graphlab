@@ -8,7 +8,6 @@
 #define PARFIL_ROBOT_H__
 
 #include <vector>
-#include <boost/random/normal_distribution.hpp>
 #include <graphlab.hpp>
 
 namespace parfil {
@@ -48,9 +47,6 @@ class Robot : public graphlab::IS_POD_TYPE {
     // Set the robot's position and heading.
     void Set(double x, double y, double heading);
 
-    // Set the robot's noise parameters.
-    void SetNoise(double steering_noise, double distance_noise, double bearing_noise);
-
     // Apply motion to the robot, adding noise.
     void Move(const Motion& motion);
 
@@ -75,15 +71,6 @@ class Robot : public graphlab::IS_POD_TYPE {
 
     // Heading or orientation in radians.
     double m_h;
-
-    // Steering noise used during movement.
-    boost::random::normal_distribution<> m_steering_noise;
-
-    // Distance noise used during movement.
-    boost::random::normal_distribution<> m_distance_noise;
-
-    // Bearing noise used during sensing.
-    boost::random::normal_distribution<> m_bearing_noise;
 
 }; // class Robot
 

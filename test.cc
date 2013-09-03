@@ -63,9 +63,6 @@ void Case2(std::vector<parfil::Motion>& motions, std::vector<parfil::Measurement
   for (int i=0; i<num_iterations; ++i)
     motions.push_back(Motion(2*M_PI/20, 12));
 
-  // Steering, distance and bearing noise, respectively.
-  robot.SetNoise(0.1,5.0,0.1);
-
   // Apply movements to the robot, generating measurements accordingly.
   robot.GenerateGroundTruth(measurements,motions);
 }

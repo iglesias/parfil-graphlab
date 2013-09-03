@@ -8,10 +8,6 @@
 
 namespace parfil {
 
-const double STEERING_NOISE = 0.1;
-const double DISTANCE_NOISE = 5.0;
-const double BEARING_NOISE  = 0.1;
-
 graphlab::atomic<graphlab::vertex_id_type> NEXT_VID;
 
 // Pointer to the motion currently processed.
@@ -41,11 +37,8 @@ DistributedFilter::DistributedFilter(graphlab::distributed_control dc, int num_p
   NEXT_VID = (((graphlab::vertex_id_type)1 << 31) / dc.numprocs()) * dc.procid();
 
   //FIXME can this be distributed?
-  for (int i=0; i<num_particles; ++i) {
-    Particle particle;
-    particle.pose.SetNoise(STEERING_NOISE,DISTANCE_NOISE,BEARING_NOISE);
-    m_graph->add_vertex(NEXT_VID.inc_ret_last(1), particle);
-  }
+  for (int i=0; i<num_particles; ++i)
+    m_graph->add_vertex(NEXT_VID.inc_ret_last(1), Particle());
 
   // Commit the graph structure, marking that it is no longer to be modified.
   m_graph->finalize();

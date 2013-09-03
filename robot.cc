@@ -9,11 +9,12 @@
 #include <cmath>
 #include <cstdlib>
 #include <iostream>
-#include <boost/random/mersenne_twister.hpp>
 
 namespace parfil {
 
-boost::random::mt19937 RNG;
+const double STEERING_NOISE = 0.1;
+const double DISTANCE_NOISE = 5.0;
+const double BEARING_NOISE  = 0.1;
 
 const double WORLD_SIZE = 100.0;
 
@@ -41,9 +42,6 @@ Robot::Robot() {
   m_x = WORLD_SIZE*std::rand()/RAND_MAX;
   m_y = WORLD_SIZE*std::rand()/RAND_MAX;
   m_h = 2.0*M_PI*std::rand()/RAND_MAX;
-
-  // Noise parameters are automatically initialized by call to their default
-  // constructor.
 }
 
 // Destructor.
@@ -63,31 +61,6 @@ void Robot::Set(double x, double y, double heading) {
   m_h = heading;
 }
 
-// Set robot's noise parameters.
-void Robot::SetNoise(double steering_noise, double distance_noise, double bearing_noise) {
-  if (steering_noise < 0) {
-    std::cerr << "Robot::SetNoise: Steering noise cannot be negative, given "
-              << steering_noise << '.' << std::endl;
-    std::exit(1);
-  }
-
-  if (distance_noise < 0) {
-    std::cerr << "Robot::SetNoise: Distance noise cannot be negative, given "
-              << distance_noise << '.' << std::endl;
-    std::exit(1);
-  }
-
-  if (bearing_noise < 0) {
-    std::cerr << "Robot::SetNoise: Bearing noise cannot be negative, given "
-              << bearing_noise << '.' << std::endl;
-    std::exit(1);
-  }
-
-  m_steering_noise = boost::random::normal_distribution<>(0,steering_noise);
-  m_distance_noise = boost::random::normal_distribution<>(0,distance_noise);
-  m_bearing_noise  = boost::random::normal_distribution<>(0,bearing_noise);
-}
-
 // Move robot.
 void Robot::Move(const Motion& motion) {
   if (motion.forward_distance < 0) {
@@ -97,11 +70,11 @@ void Robot::Move(const Motion& motion) {
   }
 
   // Turn, adding randomness to the steering angle.
-  m_h += m_steering_noise(RNG) + motion.steering_angle;
+  m_h += graphlab::random::normal(motion.steering_angle,STEERING_NOISE);
   m_h  = fmod(m_h, 2*M_PI);
 
   // Move, adding randomness to the motion.
-  double distance = motion.forward_distance + m_distance_noise(RNG);
+  double distance = graphlab::random::normal(motion.forward_distance,DISTANCE_NOISE);
   m_x += distance*cos(m_h);
   m_y += distance*sin(m_h);
 }
@@ -115,7 +88,7 @@ void Robot::Sense(Measurement& measurement, bool use_noise) {
     double bearing = atan2(LANDMARKS[i][0]-m_y, LANDMARKS[i][1]-m_x)-m_h;
 
     if (use_noise)
-      bearing += m_bearing_noise(RNG);
+      bearing += graphlab::random::normal(0,BEARING_NOISE);
 
     // Normalize the angle to the interval [0,2*pi)
     bearing = fmod(bearing, 2*M_PI);
@@ -140,8 +113,7 @@ double Robot::ComputeMeasurementProbability(const Measurement& measurement) {
     error = fmod(error+M_PI, 2*M_PI) - M_PI;
 
     // Update the total error using Gaussian noise.
-    total_error *= exp(-pow(error,2) / pow(m_bearing_noise.sigma(),2) / 2) /
-                    sqrt(2.0*M_PI*pow(m_bearing_noise.sigma(),2));
+    total_error *= exp(-pow(error,2) / pow(BEARING_NOISE,2) / 2) / sqrt(2.0*M_PI*pow(BEARING_NOISE,2));
   }
 
   return total_error;
