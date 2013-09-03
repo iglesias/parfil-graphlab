@@ -4,7 +4,7 @@
  * Copyright (c) 2013 Fernando J. Iglesias Garcia
  */
 
-#include <parfil/filter.h>
+#include "filter.h"
 #include <algorithm>
 #include <cstdlib>
 #include <cassert>

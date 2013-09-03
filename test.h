@@ -7,7 +7,7 @@
 #ifndef PARFIL_TEST_H__
 #define PARFIL_TEST_H__
 
-#include <parfil/robot.h>
+#include "robot.h"
 #include <vector>
 
 namespace parfil {

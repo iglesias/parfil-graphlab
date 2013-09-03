@@ -8,7 +8,7 @@
 #define PARFIL_FILTER_H__
 
 #include <vector>
-#include <parfil/robot.h>
+#include "robot.h"
 
 namespace parfil {
 

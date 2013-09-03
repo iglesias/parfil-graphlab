@@ -2,11 +2,11 @@
 #include <cstdlib>
 #include <memory>
 #include <vector>
-#include <parfil/robot.h>
-#include <parfil/filter.h>
 #include <ctime>
-#include <parfil/test.h>
 #include <iostream>
+#include "robot.h"
+#include "filter.h"
+#include "test.h"
 
 int main(int, char**) {
   std::srand(std::time(0));

@@ -4,7 +4,7 @@
  * Copyright (c) 2013 Fernando J. Iglesias Garcia
  */
 
-#include <parfil/test.h>
+#include "test.h"
 #include <cstdlib>
 #include <iostream>
 

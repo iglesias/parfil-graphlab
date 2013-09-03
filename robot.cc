@@ -4,7 +4,7 @@
  * Copyright (c) 2013 Fernando J. Iglesias Garcia
  */
 
-#include <parfil/robot.h>
+#include "robot.h"
 #include <cassert>
 #include <cmath>
 #include <cstdlib>
