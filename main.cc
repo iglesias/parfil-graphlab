@@ -1,23 +1,28 @@
-#include <cmath>
-#include <cstdlib>
-#include <memory>
 #include <vector>
-#include <ctime>
 #include <iostream>
-#include "robot.h"
-#include "filter.h"
-#include "test.h"
+#include <cstdlib>
+#include <ctime>
 
-int main(int, char**) {
+#include "robot.h"
+#include "test.h"
+#include "distributed_filter.h"
+
+#include <graphlab.hpp>
+
+int main(int argc, char** argv) {
+/*
   std::srand(std::time(0));
-  int num_particles = 5000;
-  std::unique_ptr<parfil::Filter> filter(new parfil::Filter(num_particles));
 
   std::vector<parfil::Motion> motions;
   std::vector<parfil::Measurement> measurements;
   parfil::Robot robot;
   parfil::test::Case2(motions,measurements,robot);
 
+  graphlab::mpi_tools::init(argc,argv);
+  graphlab::distributed_control dc;
+
+  int num_particles = 5000;
+  parfil::DistributedFilter* filter = new parfil::DistributedFilter(dc,num_particles);
   filter->Run(motions,measurements);
 
   double x,y,heading;
@@ -27,6 +32,10 @@ int main(int, char**) {
   std::cout << "Particle filter: x: " << x << " y: " << y << " heading: " << heading << std::endl;
   std::cout << "Delta: x: " << fabs(x-robot.x()) << " y: " << fabs(y-robot.y()) << " heading: " <<
                 fmod(fabs(heading-robot.heading())+M_PI, 2*M_PI)-M_PI << std::endl;
+
+  graphlab::mpi_tools::finalize();
+  delete filter;
+*/
 
   return 0;
 }
