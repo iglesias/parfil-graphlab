@@ -17,6 +17,9 @@ struct Particle {
     // Default constructor.
     Particle();
 
+    // Assign operator.
+    Particle& operator=(const Particle& rhs);
+
     // Write data to output stream.
     void save(graphlab::oarchive& oarc) const;
 

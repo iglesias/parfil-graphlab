@@ -48,6 +48,22 @@ Robot::Robot() {
 Robot::~Robot() {
 }
 
+Robot& Robot::operator=(const Robot& rhs) {
+  m_x = rhs.x();
+  m_y = rhs.y();
+  m_h = rhs.heading();
+
+  return *this;
+}
+
+void Robot::save(graphlab::oarchive& oarc) const {
+  oarc << m_x << m_y << m_h;
+}
+
+void Robot::load(graphlab::iarchive& iarc) {
+  iarc >> m_x >> m_y >> m_h;
+}
+
 // Set robot's position and heading.
 void Robot::Set(double x, double y, double heading) {
   if (heading < 0 || heading >= 2.0*M_PI) {

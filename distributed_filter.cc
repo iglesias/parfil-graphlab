@@ -20,6 +20,13 @@ Particle::Particle() {
   weight = 0.0;
 }
 
+Particle& Particle::operator=(const Particle& rhs) {
+  pose = rhs.pose;
+  weight = rhs.weight;
+
+  return *this;
+}
+
 void Particle::save(graphlab::oarchive& oarc) const {
   oarc << pose << weight;
 }

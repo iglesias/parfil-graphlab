@@ -27,13 +27,22 @@ struct Motion {
 
 // Class which contains the state of the robot and can be used to represent the
 // particles of the filter.
-class Robot : public graphlab::IS_POD_TYPE {
+class Robot {
   public:
     // Create a robot, initializing randomly its initial position and orientation.
     Robot();
 
     // Destroy the robot.
     ~Robot();
+
+    // Assign operator.
+    Robot& operator=(const Robot& rhs);
+
+    // Write data to output stream.
+    void save(graphlab::oarchive& oarc) const;
+
+    // Read data from input stream.
+    void load(graphlab::iarchive& iarc);
 
     // Get x.
     double x() const { return m_x; }
