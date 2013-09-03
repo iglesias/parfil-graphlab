@@ -8,7 +8,8 @@
 #define PARFIL_ROBOT_H__
 
 #include <vector>
-#include <random>
+#include <boost/random/normal_distribution.hpp>
+#include <graphlab.hpp>
 
 namespace parfil {
 
@@ -27,7 +28,7 @@ struct Motion {
 
 // Class which contains the state of the robot and can be used to represent the
 // particles of the filter.
-class Robot {
+class Robot : public graphlab::IS_POD_TYPE {
   public:
     // Create a robot, initializing randomly its initial position and orientation.
     Robot();
@@ -76,13 +77,13 @@ class Robot {
     double m_h;
 
     // Steering noise used during movement.
-	std::normal_distribution<> m_steering_noise;
+    boost::random::normal_distribution<> m_steering_noise;
 
     // Distance noise used during movement.
-    std::normal_distribution<> m_distance_noise;
+    boost::random::normal_distribution<> m_distance_noise;
 
     // Bearing noise used during sensing.
-    std::normal_distribution<> m_bearing_noise;
+    boost::random::normal_distribution<> m_bearing_noise;
 
 }; // class Robot
 

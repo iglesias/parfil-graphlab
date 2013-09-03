@@ -9,10 +9,11 @@
 #include <cmath>
 #include <cstdlib>
 #include <iostream>
+#include <boost/random/mersenne_twister.hpp>
 
 namespace parfil {
 
-std::mt19937 RNG;
+boost::random::mt19937 RNG;
 
 const double WORLD_SIZE = 100.0;
 
@@ -82,9 +83,9 @@ void Robot::SetNoise(double steering_noise, double distance_noise, double bearin
     std::exit(1);
   }
 
-  m_steering_noise = std::normal_distribution<>(0,steering_noise);
-  m_distance_noise = std::normal_distribution<>(0,distance_noise);
-  m_bearing_noise  = std::normal_distribution<>(0,bearing_noise);
+  m_steering_noise = boost::random::normal_distribution<>(0,steering_noise);
+  m_distance_noise = boost::random::normal_distribution<>(0,distance_noise);
+  m_bearing_noise  = boost::random::normal_distribution<>(0,bearing_noise);
 }
 
 // Move robot.
@@ -139,8 +140,8 @@ double Robot::ComputeMeasurementProbability(const Measurement& measurement) {
     error = fmod(error+M_PI, 2*M_PI) - M_PI;
 
     // Update the total error using Gaussian noise.
-    total_error *= exp(-pow(error,2) / pow(m_bearing_noise.stddev(),2) / 2) /
-                    sqrt(2.0*M_PI*pow(m_bearing_noise.stddev(),2));
+    total_error *= exp(-pow(error,2) / pow(m_bearing_noise.sigma(),2) / 2) /
+                    sqrt(2.0*M_PI*pow(m_bearing_noise.sigma(),2));
   }
 
   return total_error;
