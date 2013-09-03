@@ -16,24 +16,23 @@ const Motion* MOTION = NULL;
 const Measurement* MEASUREMENT = NULL;
 
 // Constructor from the number of particles.
-DistributedFilter::DistributedFilter(graphlab::distributed_control dc, int num_particles) {
+DistributedFilter::DistributedFilter(int num_particles, graph_type& graph, graphlab::distributed_control& dc) {
   assert(num_particles>0);
 
-  // Create the distributed graph.
-  m_graph = new DistributedGraph(dc);
   NEXT_VID = (((graphlab::vertex_id_type)1 << 31) / dc.numprocs()) * dc.procid();
 
   //FIXME can this be distributed?
   for (int i=0; i<num_particles; ++i)
-    m_graph->add_vertex(NEXT_VID.inc_ret_last(1), Particle());
+    graph.add_vertex(NEXT_VID.inc_ret_last(1), Particle());
 
   // Commit the graph structure, marking that it is no longer to be modified.
-  m_graph->finalize();
+  graph.finalize();
+
+  m_graph = &graph;
 }
 
 // Destructor.
 DistributedFilter::~DistributedFilter() {
-  delete m_graph;
 }
 
 // Extract position from the particle set using reducing the vertices of the
@@ -68,11 +67,11 @@ void DistributedFilter::MeasurementUpdate(const Measurement& measurement) {
   m_graph->transform_vertices(ParticleMeasurementUpdate);
 }
 
-void ParticlePredict(DistributedGraph::vertex_type& v) {
+void ParticlePredict(graph_type::vertex_type& v) {
   v.data().Move(*MOTION);
 }
 
-void ParticleMeasurementUpdate(DistributedGraph::vertex_type& v) {
+void ParticleMeasurementUpdate(graph_type::vertex_type& v) {
   v.data().UpdateWeight(*MEASUREMENT);
 }
 

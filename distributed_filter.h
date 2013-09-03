@@ -12,7 +12,7 @@
 
 namespace parfil {
 
-typedef graphlab::distributed_graph<Particle, graphlab::empty> DistributedGraph;
+typedef graphlab::distributed_graph<Particle, graphlab::empty> graph_type;
 
 // Class which contains the set of particles and performs the particle filtering
 // algorithm in a distributed fashion using GraphLab.
@@ -20,7 +20,7 @@ class DistributedFilter {
   public:
     // Create a distributed filter with the specified number of particles
     // randomly initialized.
-    DistributedFilter(graphlab::distributed_control dc, int num_particles);
+    DistributedFilter(int num_particles, graph_type& graph, graphlab::distributed_control& dc);
 
     // Destroy the filter.
     ~DistributedFilter();
@@ -44,15 +44,15 @@ class DistributedFilter {
 
  private:
     // The distributed graph.
-    DistributedGraph* m_graph;
+    graph_type* m_graph;
 
 }; // class DistributedFilter
 
 // Motion update for one particle.
-void ParticlePredict(DistributedGraph::vertex_type& v);
+void ParticlePredict(graph_type::vertex_type& v);
 
 // Measurement update for one particle.
-void ParticleMeasurementUpdate(DistributedGraph::vertex_type& v);
+void ParticleMeasurementUpdate(graph_type::vertex_type& v);
 
 } // namespace parfil
 
