@@ -41,7 +41,6 @@ Particle::Particle() {
   m_x = graphlab::random::uniform(0.0,WORLD_SIZE);
   m_y = graphlab::random::uniform(0.0,WORLD_SIZE);
   m_y = graphlab::random::uniform(0.0,2.0*M_PI);
-  m_w = 0.0;
 }
 
 // Destructor.
@@ -50,40 +49,22 @@ Particle::~Particle() {
 
 Particle& Particle::operator=(const Particle& rhs) {
   SetPose(rhs.x(),rhs.y(),rhs.heading());
-  SetWeight(rhs.weight());
   return *this;
 }
 
 void Particle::save(graphlab::oarchive& oarc) const {
-  oarc << m_x << m_y << m_h << m_w;
+  oarc << m_x << m_y << m_h;
 }
 
 void Particle::load(graphlab::iarchive& iarc) {
-  iarc >> m_x >> m_y >> m_h >> m_w;
+  iarc >> m_x >> m_y >> m_h;
 }
 
 // Set particle's position and heading.
 void Particle::SetPose(double x, double y, double heading) {
-  if (heading < 0 || heading >= 2.0*M_PI) {
-    std::cerr << "Particle::SetPose: The heading must be in [0,2*Pi), given "
-              << heading <<  '.' << std::endl;
-    std::exit(1);
-  }
-  
   m_x = x;
   m_y = y;
   m_h = heading;
-}
-
-// Set particle's weight.
-void Particle::SetWeight(double weight) {
-  if (weight < 0) {
-    std::cerr << "Particle::SetWeight: The weight must be larger than zero, given "
-              << weight <<  '.' << std::endl;
-    std::exit(1);
-  }
-
-  m_w = weight;
 }
 
 // Move particle.
@@ -100,8 +81,8 @@ void Particle::Move(const Motion& motion) {
 
   // Move, adding randomness to the motion.
   double distance = graphlab::random::normal(motion.forward_distance,DISTANCE_NOISE);
-  m_x += distance*cos(m_h);
-  m_y += distance*sin(m_h);
+  m_x += distance*std::cos(m_h);
+  m_y += distance*std::sin(m_h);
 }
 
 // Measure bearing to landmarks.
@@ -124,7 +105,7 @@ void Particle::Sense(Measurement& measurement, bool use_noise) {
 
 // Computes the probability of a mesurement of the bearings and update the
 // particle's weight.
-void Particle::UpdateWeight(const Measurement& measurement) {
+double Particle::ComputeMeasurementProbability(const Measurement& measurement) {
   // Compute the noiseless measurement.
   Measurement true_measurement;
   Sense(true_measurement,false);
@@ -142,7 +123,7 @@ void Particle::UpdateWeight(const Measurement& measurement) {
     total_error *= exp(-pow(error,2) / pow(BEARING_NOISE,2) / 2) / sqrt(2.0*M_PI*pow(BEARING_NOISE,2));
   }
 
-  SetWeight(total_error);
+  return total_error;
 }
 
 // Simulate particle movement and fill in measurements.
@@ -155,10 +136,6 @@ void Particle::GenerateGroundTruth(std::vector<Measurement>& measurements, const
     Move(motions[i]);
     Sense(measurements[i]);
   }
-}
-
-bool Particle::WeightComparator(const Particle& lhs, const Particle& rhs) {
-  return lhs.weight() < rhs.weight();
 }
 
 } // namespace parfil

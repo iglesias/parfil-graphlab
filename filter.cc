@@ -23,6 +23,9 @@ Filter::Filter(int num_particles) {
 
   for (int i=0; i<num_particles; ++i)
     m_particles.push_back(Particle());
+
+  // Weights allocation.
+  m_weights.resize(num_particles);
 }
 
 // Destructor.
@@ -67,22 +70,24 @@ void Filter::Predict(const Motion& motion) {
 
 void Filter::MeasurementUpdate(const Measurement& measurement) {
   for (unsigned int i=0; i<m_particles.size(); ++i)
-    m_particles[i].UpdateWeight(measurement);
+    m_weights[i] = m_particles[i].ComputeMeasurementProbability(measurement);
 }
 
 // Circular resampling.
 void Filter::Resample() {
+  assert(m_weights.size()==m_particles.size());
+
   int index = int(1.0*std::rand()/RAND_MAX*m_particles.size());
   double beta = 0.0;
-  double max_weight = std::max_element(m_particles.begin(),m_particles.end(),Particle::WeightComparator)->weight();
+  double max_weight = *std::max_element(m_weights.begin(),m_weights.end());
   std::vector<Particle> new_particles;
   new_particles.reserve(m_particles.size());
 
   for (unsigned int i=0; i<m_particles.size(); ++i) {
     beta += 1.0*std::rand()/RAND_MAX*2*max_weight;
 
-    while (beta > m_particles[index].weight()) {
-      beta -= m_particles[index].weight();
+    while (beta > m_weights[index]) {
+      beta -= m_weights[index];
       index = (index+1)%m_particles.size();
     }
 

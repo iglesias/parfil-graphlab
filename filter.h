@@ -43,6 +43,9 @@ class Filter {
     // The particle set.
     std::vector<Particle> m_particles;
 
+    // The weights of the particles.
+    std::vector<double> m_weights;
+
 }; // class Filter
 
 } // namespace parfil

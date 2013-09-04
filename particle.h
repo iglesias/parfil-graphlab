@@ -53,14 +53,8 @@ class Particle {
     // Get heading.
     double heading() const { return m_h; }
 
-    // Get weight.
-    double weight() const { return m_w; }
-
     // Set the particle's position and heading.
     void SetPose(double x, double y, double heading);
-
-    // Set the particle's weight.
-    void SetWeight(double weight);
 
     // Apply motion to the particle, adding noise.
     void Move(const Motion& motion);
@@ -70,14 +64,10 @@ class Particle {
 
     // Compute the probability of a measurement given the particle's pose and
     // update the particle's weight.
-    void UpdateWeight(const Measurement& measurement);
+    double ComputeMeasurementProbability(const Measurement& measurement);
 
     // Simulate movement, filling in measurements accordingly.
     void GenerateGroundTruth(std::vector<Measurement>& measurements, const std::vector<Motion>& motions);
-
-    // Compare particles' weights. This method returns true if the weight of
-    // the lhs particle is *less* than the weight of the rhs particle.
-    static bool WeightComparator(const Particle& lhs, const Particle& rhs);
 
   private:
     // Position in x measured in metres.
@@ -88,9 +78,6 @@ class Particle {
 
     // Heading or orientation in radians.
     double m_h;
-
-    // Weight of the particle useful for the particle filter;
-    double m_w;
 
 }; // class Particle
 
