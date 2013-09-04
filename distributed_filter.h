@@ -20,7 +20,7 @@ class DistributedFilter {
   public:
     // Create a distributed filter with the specified number of particles
     // randomly initialized.
-    DistributedFilter(int num_particles, graph_type& graph, graphlab::distributed_control& dc);
+    DistributedFilter(int num_particles, graph_type& graph);
 
     // Destroy the filter.
     ~DistributedFilter();
@@ -53,6 +53,31 @@ void ParticlePredict(graph_type::vertex_type& v);
 
 // Measurement update for one particle.
 void ParticleMeasurementUpdate(graph_type::vertex_type& v);
+
+// Resample for one particle.
+void ParticleResample(graph_type::vertex_type& v);
+
+// MapReduce to compute the maximum particle weight.
+struct max_weight_reducer : public graphlab::IS_POD_TYPE {
+  double max_weight;
+
+  static max_weight_reducer get_max_weight(const graph_type::vertex_type& v);
+
+  max_weight_reducer& operator+=(const max_weight_reducer& other);
+}; // struct max_weight_reducer
+
+// MapReduce to compute the pose applying using maximum likelihood over the
+// particle set.
+struct pose_reducer : public graphlab::IS_POD_TYPE {
+  double x;
+  double y;
+  double heading_x;
+  double heading_y;
+
+  static pose_reducer get_pose(const graph_type::vertex_type& v);
+
+  pose_reducer& operator+=(const pose_reducer& other);
+}; // struct pose_reducer
 
 } // namespace parfil
 

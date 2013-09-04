@@ -23,8 +23,8 @@ int main(int argc, char** argv) {
   graphlab::distributed_control dc;
   parfil::graph_type graph(dc,clopts);
 
-  int num_particles = 5000;
-  parfil::DistributedFilter filter(num_particles,graph,dc);
+  int num_particles = 50000;
+  parfil::DistributedFilter filter(num_particles,graph);
   filter.Run(motions,measurements);
 
   double x,y,heading;

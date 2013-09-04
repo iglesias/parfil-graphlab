@@ -5,25 +5,30 @@
  */
 
 #include "distributed_filter.h"
+#include <cmath>
 
 namespace parfil {
 
-graphlab::atomic<graphlab::vertex_id_type> NEXT_VID;
-
+// Set of particles required to perfrom resampling.
+std::vector<Particle> PARTICLES;
+// Particle weights.
+std::vector<double> WEIGHTS;
+// Maximum particle weight.
+double MAX_WEIGHT;
 // Pointer to the motion currently processed.
 const Motion* MOTION = NULL;
 // Pointer to the measurement currently processed.
 const Measurement* MEASUREMENT = NULL;
 
 // Constructor from the number of particles.
-DistributedFilter::DistributedFilter(int num_particles, graph_type& graph, graphlab::distributed_control& dc) {
+DistributedFilter::DistributedFilter(int num_particles, graph_type& graph) {
   assert(num_particles>0);
+  // Allocate memory for the particle set.
+  PARTICLES.resize(num_particles);
+  WEIGHTS.resize(num_particles);
 
-  NEXT_VID = (((graphlab::vertex_id_type)1 << 31) / dc.numprocs()) * dc.procid();
-
-  //FIXME can this be distributed?
-  for (int i=0; i<num_particles; ++i)
-    graph.add_vertex(NEXT_VID.inc_ret_last(1), Particle());
+  for (int id=0; id<num_particles; ++id)
+    graph.add_vertex(id, Particle());
 
   // Commit the graph structure, marking that it is no longer to be modified.
   graph.finalize();
@@ -38,7 +43,13 @@ DistributedFilter::~DistributedFilter() {
 // Extract position from the particle set using reducing the vertices of the
 // graph.
 void DistributedFilter::GetPose(double& x, double& y, double& heading) const {
-  //TODO
+  // Sum all the poses (taking care of adding up the heading appropriately).
+  pose_reducer r = m_graph->map_reduce_vertices<pose_reducer>(pose_reducer::get_pose);
+
+  // Maximum likelihood estimation of the pose.
+  x = r.x/PARTICLES.size();
+  y = r.y/PARTICLES.size();
+  heading = std::atan2(r.heading_y,r.heading_x);
 }
 
 // Run Particle filter.
@@ -54,7 +65,11 @@ void DistributedFilter::Run(const std::vector<Motion>& motions, const std::vecto
 
 // Weights resampling.
 void DistributedFilter::Resample() {
-  //TODO
+  // Find the largest particle weight.
+  MAX_WEIGHT = m_graph->map_reduce_vertices<max_weight_reducer>
+      (max_weight_reducer::get_max_weight).max_weight;
+  // Resample particles.
+  m_graph->transform_vertices(ParticleResample);
 }
 
 void DistributedFilter::Predict(const Motion& motion) {
@@ -69,10 +84,56 @@ void DistributedFilter::MeasurementUpdate(const Measurement& measurement) {
 
 void ParticlePredict(graph_type::vertex_type& v) {
   v.data().Move(*MOTION);
+  PARTICLES[v.id()] = v.data();
 }
 
 void ParticleMeasurementUpdate(graph_type::vertex_type& v) {
-  v.data().UpdateWeight(*MEASUREMENT);
+  WEIGHTS[v.id()] = v.data().ComputeMeasurementProbability(*MEASUREMENT);
+}
+
+void ParticleResample(graph_type::vertex_type& v) {
+  size_t index = graphlab::random::uniform(size_t(0),PARTICLES.size()-1);
+  double beta = graphlab::random::uniform(0.0,2*MAX_WEIGHT);
+
+  while (beta > WEIGHTS[index]) {
+    beta -= WEIGHTS[index];
+    index = (index+1)%PARTICLES.size();
+  }
+
+  v.data() = PARTICLES[index];
+}
+
+max_weight_reducer max_weight_reducer::get_max_weight(const graph_type::vertex_type& v) {
+  max_weight_reducer r;
+  r.max_weight = WEIGHTS[v.id()];
+  return r;
+}
+
+max_weight_reducer& max_weight_reducer::operator+=(const max_weight_reducer& other) {
+  max_weight = std::max(max_weight, other.max_weight);
+  return *this;
+}
+
+pose_reducer pose_reducer::get_pose(const graph_type::vertex_type& v) {
+  pose_reducer r;
+
+  r.x = v.data().x();
+  r.y = v.data().y();
+
+  r.heading_x = std::cos(v.data().heading());
+  r.heading_y = std::sin(v.data().heading());
+
+  return r;
+}
+
+pose_reducer& pose_reducer::operator+=(const pose_reducer& other) {
+  x += other.x;
+  y += other.y;
+
+  heading_x += other.heading_x;
+  heading_y += other.heading_y;
+
+  return *this;
 }
 
 } // namespace parfil
