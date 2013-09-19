@@ -8,7 +8,7 @@ message(STATUS "Using compiler: ${CMAKE_CXX_COMPILER}" )
 message(STATUS "Build Type: ${CMAKE_BUILD_TYPE}")
 message(STATUS "Arch: ${CMAKE_SYSTEM_PROCESSOR}")
 
-set(CMAKE_CXX_FLAGS "-D HAS_MPI")
+set(CMAKE_CXX_FLAGS "-DHAS_MPI -fopenmp")
 
 # set the default path for built executables to the "bin" directory
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
