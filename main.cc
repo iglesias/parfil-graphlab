@@ -1,3 +1,9 @@
+/* This software is distributed under the MIT license (see LICENSE file in the
+ * root directory)
+ *
+ * Copyright (c) 2013 Fernando J. Iglesias Garcia
+ */
+
 #include <vector>
 #include <iostream>
 #include <ctime>
@@ -14,7 +20,7 @@ int main(int argc, char** argv) {
   std::vector<parfil::Motion> motions;
   std::vector<parfil::Measurement> measurements;
   parfil::Particle robot_pose;
-  parfil::test::Case2(motions,measurements,robot_pose,1e4);
+  parfil::test::Case2(motions,measurements,robot_pose,10);
 
   graphlab::command_line_options clopts("Particle filter.");
 
@@ -24,7 +30,7 @@ int main(int argc, char** argv) {
   graphlab::distributed_control dc;
   parfil::graph_type graph(dc,clopts);
 
-  int num_particles = 1000;
+  int num_particles = 500;
   parfil::DistributedFilter filter(num_particles,graph);
   std::time_t start = std::time(NULL);
   filter.Run(motions,measurements);
