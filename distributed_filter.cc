@@ -9,7 +9,7 @@
 
 namespace parfil {
 
-// Set of particles required to perfrom resampling.
+// Set of particles required to perform resampling.
 std::vector<Particle> PARTICLES;
 // Particle weights.
 std::vector<double> WEIGHTS;
@@ -40,8 +40,7 @@ DistributedFilter::DistributedFilter(int num_particles, graph_type& graph) {
 DistributedFilter::~DistributedFilter() {
 }
 
-// Extract position from the particle set using reducing the vertices of the
-// graph.
+// Extract position from the particle set reducing the vertices of the graph.
 void DistributedFilter::GetPose(double& x, double& y, double& heading) const {
   // Sum all the poses (taking care of adding up the heading appropriately).
   pose_reducer r = m_graph->map_reduce_vertices<pose_reducer>(pose_reducer::get_pose);
@@ -66,8 +65,7 @@ void DistributedFilter::Run(const std::vector<Motion>& motions, const std::vecto
 // Weights resampling.
 void DistributedFilter::Resample() {
   // Find the largest particle weight.
-  MAX_WEIGHT = m_graph->map_reduce_vertices<max_weight_reducer>
-      (max_weight_reducer::get_max_weight).max_weight;
+  MAX_WEIGHT = m_graph->map_reduce_vertices<max_weight_reducer>(max_weight_reducer::get_max_weight).max_weight;
   // Resample particles.
   m_graph->transform_vertices(ParticleResample);
 }
@@ -104,9 +102,7 @@ void ParticleResample(graph_type::vertex_type& v) {
 }
 
 max_weight_reducer max_weight_reducer::get_max_weight(const graph_type::vertex_type& v) {
-  max_weight_reducer r;
-  r.max_weight = WEIGHTS[v.id()];
-  return r;
+  return max_weight_reducer(WEIGHTS[v.id()]);
 }
 
 max_weight_reducer& max_weight_reducer::operator+=(const max_weight_reducer& other) {

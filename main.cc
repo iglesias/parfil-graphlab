@@ -20,7 +20,7 @@ int main(int argc, char** argv) {
   std::vector<parfil::Motion> motions;
   std::vector<parfil::Measurement> measurements;
   parfil::Particle robot_pose;
-  parfil::test::Case2(motions,measurements,robot_pose,10);
+  parfil::test::Case2(motions, measurements, robot_pose, 1000);
 
   graphlab::command_line_options clopts("Particle filter.");
 
@@ -30,20 +30,17 @@ int main(int argc, char** argv) {
   graphlab::distributed_control dc;
   parfil::graph_type graph(dc,clopts);
 
-  int num_particles = 500;
+  int num_particles = 50000;
   parfil::DistributedFilter filter(num_particles,graph);
   std::time_t start = std::time(NULL);
   filter.Run(motions,measurements);
-  std::cout << "Wall time passed: " << std::difftime(std::time(NULL),start)
-            << " (s).\n";
+  dc.cout() << "Wall time passed: " << std::difftime(std::time(NULL),start) << " (s).\n";
 
   double x,y,heading;
   filter.GetPose(x,y,heading);
-  std::cout << "Ground truth: x: " << robot_pose.x() << " y: " << robot_pose.y() << " heading: " <<
-                robot_pose.heading() << std::endl;
-  std::cout << "Particle filter: x: " << x << " y: " << y << " heading: " << heading << std::endl;
-  std::cout << "Delta: x: " << fabs(x-robot_pose.x()) << " y: " << fabs(y-robot_pose.y()) << " heading: " <<
-                fmod(fabs(heading-robot_pose.heading())+M_PI, 2*M_PI)-M_PI << std::endl;
+  dc.cout() << "Ground truth: x: " << robot_pose.x() << " y: " << robot_pose.y() << " heading: " << robot_pose.heading() << std::endl;
+  dc.cout() << "Particle filter: x: " << x << " y: " << y << " heading: " << heading << std::endl;
+  dc.cout() << "Delta: x: " << fabs(x-robot_pose.x()) << " y: " << fabs(y-robot_pose.y()) << " heading: " << fmod(fabs(heading-robot_pose.heading())+M_PI, 2*M_PI)-M_PI << std::endl;
 
   graphlab::mpi_tools::finalize();
 
