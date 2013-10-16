@@ -6,7 +6,6 @@
 
 #include <vector>
 #include <iostream>
-#include <ctime>
 
 #include "particle.h"
 #include "test.h"
@@ -20,7 +19,12 @@ int main(int argc, char** argv) {
   std::vector<parfil::Motion> motions;
   std::vector<parfil::Measurement> measurements;
   parfil::Particle robot_pose;
-  parfil::test::Case2(motions, measurements, robot_pose, 1000);
+
+  int num_iterations = 0;
+  if (argc > 1) num_iterations = atoi(argv[1]);
+  if (num_iterations == 0) num_iterations = 1000;
+
+  parfil::test::Case2(motions, measurements, robot_pose, num_iterations);
 
   graphlab::command_line_options clopts("Particle filter.");
 
@@ -30,11 +34,12 @@ int main(int argc, char** argv) {
   graphlab::distributed_control dc;
   parfil::graph_type graph(dc,clopts);
 
-  int num_particles = 50000;
+  int num_particles = 1000;
   parfil::DistributedFilter filter(num_particles,graph);
-  std::time_t start = std::time(NULL);
+  graphlab::timer timer;
+  timer.start();
   filter.Run(motions,measurements);
-  dc.cout() << "Wall time passed: " << std::difftime(std::time(NULL),start) << " (s).\n";
+  dc.cout() << "Wall time passed: " << timer.current_time() << " (s).\n";
 
   double x,y,heading;
   filter.GetPose(x,y,heading);
