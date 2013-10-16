@@ -61,6 +61,10 @@ void ParticleResample(graph_type::vertex_type& v);
 struct max_weight_reducer : public graphlab::IS_POD_TYPE {
   double max_weight;
 
+  max_weight_reducer();
+
+  explicit max_weight_reducer(double weight);
+
   static max_weight_reducer get_max_weight(const graph_type::vertex_type& v);
 
   max_weight_reducer& operator+=(const max_weight_reducer& other);

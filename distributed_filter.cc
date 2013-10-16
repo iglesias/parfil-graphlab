@@ -101,6 +101,10 @@ void ParticleResample(graph_type::vertex_type& v) {
   v.data() = PARTICLES[index];
 }
 
+max_weight_reducer::max_weight_reducer() : max_weight(0.0) { }
+
+max_weight_reducer::max_weight_reducer(double weight) : max_weight(weight) { }
+
 max_weight_reducer max_weight_reducer::get_max_weight(const graph_type::vertex_type& v) {
   return max_weight_reducer(WEIGHTS[v.id()]);
 }
