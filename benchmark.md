@@ -1,6 +1,5 @@
 Using the aggregation framework through global variables. The distributed graph does not
-have any edges created explicitly. However, due to the use of the global variables, we
-can think about it as if it were a complete graph.
+have any edges created explicitly.
 
 Building data using ```parfil::tests::Case2``` with 1000 particles.
 
